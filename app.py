@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
+from functools import wraps # Добавили для защиты страниц
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
@@ -17,15 +18,25 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
-# --- Маршруты теперь проще ---
+# Декоратор для защиты страниц (если не залогинен - перекидывает на регистрацию)
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            return redirect(url_for('register'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 @app.route('/')
+@login_required # Теперь главная доступна только после входа
 def home():
-    # Теперь он ищет файл index.html в папке templates
     return render_template('index.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if 'username' in session: # Если уже залогинен, не пускаем на страницу регистрации
+        return redirect(url_for('home'))
+        
     error = None
     if request.method == 'POST':
         username = request.form['username']
@@ -37,12 +48,28 @@ def register():
             new_user = User(username=username, password=password, language=language)
             db.session.add(new_user)
             db.session.commit()
-            session['language'] = language
             session['username'] = username
+            session['language'] = language
             return redirect(url_for('home'))
-    
-    # Ищет файл register.html в папке templates
     return render_template('register.html', error=error)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if 'username' in session:
+        return redirect(url_for('home'))
+        
+    error = None
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username, password=password).first()
+        if user:
+            session['username'] = user.username
+            session['language'] = user.language
+            return redirect(url_for('home'))
+        else:
+            error = 'Неверный логин или пароль!' if session.get('language', 'ru') == 'ru' else 'Invalid username or password!'
+    return render_template('login.html', error=error)
 
 @app.route('/switch_language', methods=['GET'])
 def switch_language():
@@ -54,8 +81,7 @@ def switch_language():
 @app.route('/logout', methods=['POST'])
 def logout():
     session.pop('username', None)
-    session.pop('language', None)
-    return redirect(url_for('home'))
+    return redirect(url_for('register'))
 
 if __name__ == '__main__':
     app.debug = True  
