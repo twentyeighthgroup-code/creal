@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
@@ -5,7 +6,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///users.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -16,9 +18,16 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False) 
     language = db.Column(db.String(10), nullable=False, default='ru')
 
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    author = db.Column(db.String(80), nullable=False)
+    category = db.Column(db.String(20), default='news')
+
 with app.app_context():
     db.create_all()
-
 
 def login_required(f):
     @wraps(f)
@@ -31,23 +40,34 @@ def login_required(f):
 @app.route('/')
 @login_required 
 def home():
-    return render_template('index.html')
+    
+    all_posts = Post.query.all()
+    return render_template('index.html', posts=all_posts)
+
+@app.route('/add_post', methods=['POST'])
+@login_required
+def add_post():
+    title = request.form.get('title')
+    content = request.form.get('content')
+    category = request.form.get('category', 'news')
+    
+    if title and content:
+        new_post = Post(title=title, content=content, category=category, author=session['username'])
+        db.session.add(new_post)
+        db.session.commit()
+    return redirect(url_for('home'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if 'username' in session:
-        return redirect(url_for('home'))
-        
+    if 'username' in session: return redirect(url_for('home'))
     error = None
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         language = request.form['language']
-        
         if User.query.filter_by(username=username).first():
-            error = 'Пользователь уже существует!' if session.get('language', 'ru') == 'ru' else 'User already exists!'
+            error = 'Пользователь уже существует!'
         else:
-            
             hashed_password = generate_password_hash(password)
             new_user = User(username=username, password=hashed_password, language=language)
             db.session.add(new_user)
@@ -59,31 +79,22 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if 'username' in session:
-        return redirect(url_for('home'))
-        
+    if 'username' in session: return redirect(url_for('home'))
     error = None
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        
-        
-        user = User.query.filter_by(username=username).first()
-        
-        
-        if user and check_password_hash(user.password, password):
+        user = User.query.filter_by(username=request.form['username']).first()
+        if user and check_password_hash(user.password, request.form['password']):
             session['username'] = user.username
             session['language'] = user.language
             return redirect(url_for('home'))
         else:
-            error = 'Неверный логин или пароль!' if session.get('language', 'ru') == 'ru' else 'Invalid username or password!'
+            error = 'Неверный логин или пароль!'
     return render_template('login.html', error=error)
 
 @app.route('/switch_language', methods=['GET'])
 def switch_language():
     lang = request.args.get('lang')
-    if lang and lang in ['ru', 'en']:
-        session['language'] = lang
+    if lang in ['ru', 'en']: session['language'] = lang
     return redirect(request.referrer or url_for('home'))
 
 @app.route('/logout', methods=['POST'])
