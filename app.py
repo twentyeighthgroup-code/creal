@@ -9,17 +9,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Модель пользователя
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False) # Увеличил размер для хэша
+    password = db.Column(db.String(200), nullable=False) 
     language = db.Column(db.String(10), nullable=False, default='ru')
 
 with app.app_context():
     db.create_all()
 
-# Декоратор для защиты страниц
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -35,7 +35,7 @@ def home():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if 'username' in session: 
+    if 'username' in session:
         return redirect(url_for('home'))
         
     error = None
@@ -47,7 +47,7 @@ def register():
         if User.query.filter_by(username=username).first():
             error = 'Пользователь уже существует!' if session.get('language', 'ru') == 'ru' else 'User already exists!'
         else:
-            # Хэшируем пароль
+            
             hashed_password = generate_password_hash(password)
             new_user = User(username=username, password=hashed_password, language=language)
             db.session.add(new_user)
@@ -67,10 +67,10 @@ def login():
         username = request.form['username']
         password = request.form['password']
         
-        # Ищем пользователя по имени
+        
         user = User.query.filter_by(username=username).first()
         
-        # Проверяем пароль через хэш
+        
         if user and check_password_hash(user.password, password):
             session['username'] = user.username
             session['language'] = user.language
@@ -92,5 +92,4 @@ def logout():
     return redirect(url_for('register'))
 
 if __name__ == '__main__':
-    app.debug = True  
-    app.run()
+    app.run(debug=True)
