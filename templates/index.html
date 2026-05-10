@@ -22,71 +22,41 @@
       --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
-      color: var(--text-light);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark)); color: var(--text-light); min-height: 100vh; overflow-x: hidden; }
     #particles-js { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
     .app-container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
 
     /* --- Navigation --- */
     nav {
       position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-      width: 95%; max-width: 1200px;
-      background: var(--glass-bg); backdrop-filter: blur(16px);
+      width: 95%; max-width: 1200px; background: var(--glass-bg); backdrop-filter: blur(16px);
       border: var(--glass-border); border-radius: var(--border-radius);
       padding: 0.8rem 2rem; display: flex; justify-content: space-between; align-items: center;
       z-index: 1000; box-shadow: var(--shadow-md);
     }
-    .nav-brand {
-      display: flex; align-items: center; text-decoration: none;
-      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.6rem; color: white;
-    }
+    .nav-brand { display: flex; align-items: center; text-decoration: none; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.6rem; color: white; }
     .nav-brand img { width: 45px; height: 45px; border-radius: 8px; margin-right: 12px; border: 1px solid var(--accent-gold); }
     .nav-links { display: flex; gap: 1.5rem; }
     .nav-links a { text-decoration: none; color: var(--text-light); font-weight: 600; padding: 0.5rem 1rem; border-radius: 50px; transition: var(--transition); }
     .nav-links a:hover, .nav-links a.active { color: var(--accent-gold); background: rgba(255, 204, 51, 0.1); }
     
-    .mobile-menu-btn { display: none; background: none; border: none; color: var(--text-light); font-size: 1.5rem; cursor: pointer; }
-
     /* --- Sections --- */
     .main-content { margin-top: 120px; }
     .section { display: none; opacity: 0; animation: fadeIn 0.6s ease forwards; }
     .section.active { display: block; opacity: 1; }
     @keyframes fadeIn { to { opacity: 1; } }
-    
-    .section-title {
-      font-family: 'Space Grotesk', sans-serif; font-size: 2.8rem; margin-bottom: 2rem;
-      background: linear-gradient(90deg, var(--accent-blue), var(--accent-gold));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
+    .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 2.8rem; margin-bottom: 2rem; background: linear-gradient(90deg, var(--accent-blue), var(--accent-gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
     /* --- Cards --- */
     .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; margin-top: 2rem; }
     .card { background: var(--glass-bg); border: var(--glass-border); border-radius: var(--border-radius); padding: 1.5rem; transition: 0.3s; position: relative; }
     .card:hover { border-color: var(--accent-gold); transform: translateY(-5px); }
 
-    .btn {
-      background: linear-gradient(90deg, var(--accent-blue), var(--accent-gold));
-      color: var(--primary-dark); border: none; padding: 0.8rem 1.8rem;
-      border-radius: 50px; cursor: pointer; font-weight: 700; transition: var(--transition);
-    }
+    /* --- Forms & Buttons --- */
+    .btn { background: linear-gradient(90deg, var(--accent-blue), var(--accent-gold)); color: var(--primary-dark); border: none; padding: 0.8rem 1.8rem; border-radius: 50px; cursor: pointer; font-weight: 700; transition: var(--transition); }
     .btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(255, 204, 51, 0.4); }
-    .btn-secondary { background: var(--tertiary-dark); color: white; }
-
-    /* --- Forms & Profile --- */
     .upload-form { background: var(--glass-bg); border: var(--glass-border); border-radius: var(--border-radius); padding: 2rem; margin-bottom: 2rem; }
-    .form-control { width: 100%; padding: 0.9rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; margin-top: 0.5rem; }
-    .avatar { width: 120px; height: 120px; border-radius: 50%; background: var(--tertiary-dark); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--accent-gold); }
-    .tab-btn { background: var(--tertiary-dark); border: var(--glass-border); color: white; padding: 0.8rem 1.5rem; border-radius: 50px; cursor: pointer; }
-    .tab-btn.active { background: var(--accent-gold); color: var(--primary-dark); }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    @media (max-width: 768px) { nav { flex-direction: column; } .nav-links { display: none; } .nav-links.active { display: flex; flex-direction: column; } .mobile-menu-btn { display: block; position: absolute; top: 1rem; right: 1rem; } }
+    .form-control { width: 100%; padding: 0.9rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; margin-top: 0.5rem; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
@@ -104,37 +74,39 @@
         <a href="#" onclick="showSection('music')">Music</a>
         <a href="#" onclick="showSection('profile')">Profile</a>
       </div>
-      <button class="mobile-menu-btn" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
     </nav>
 
     <div class="main-content">
       <section id="home" class="section active">
         <h1 class="section-title">Добро пожаловать в Creal</h1>
-        <button class="btn" onclick="showSection('videos')">Начать исследовать</button>
+        <button class="btn" onclick="showSection('news')">Перейти к новостям</button>
       </section>
 
-      <section id="videos" class="section">
-        <h2 class="section-title">Видео</h2>
-        <div class="card-grid">
-           <!-- Твои карточки видео -->
-           <div class="card"><h3>Пример видео</h3><p>Описание...</p></div>
-        </div>
-      </section>
+      <section id="videos" class="section"><h2 class="section-title">Видео</h2></section>
 
       <section id="news" class="section">
         <h2 class="section-title">Новости</h2>
-        <div class="card-grid"><div class="card"><h3>Новость 1</h3></div></div>
+        <!-- Форма добавления -->
+        <form action="/add_post" method="POST" class="upload-form">
+            <input type="hidden" name="category" value="news">
+            <input type="text" name="title" class="form-control" placeholder="Заголовок новости" required>
+            <textarea name="content" class="form-control" placeholder="Текст новости..." rows="3" required></textarea>
+            <button type="submit" class="btn">Опубликовать</button>
+        </form>
+        <!-- Лента постов -->
+        <div class="card-grid">
+            {% for post in posts %}
+              <div class="card">
+                <h3>{{ post.title }}</h3>
+                <p>{{ post.content }}</p>
+                <small style="color:var(--accent-gold); display:block; margin-top:10px;">Автор: {{ post.author }}</small>
+              </div>
+            {% endfor %}
+        </div>
       </section>
 
-      <section id="music" class="section">
-        <h2 class="section-title">Музыка</h2>
-        <div class="card-grid"><div class="card"><h3>Трек 1</h3></div></div>
-      </section>
-
-      <section id="profile" class="section">
-        <div class="avatar"><i class="fas fa-user"></i></div>
-        <h2 style="text-align:center;">{{ session.get('username', 'Гость') }}</h2>
-      </section>
+      <section id="music" class="section"><h2 class="section-title">Музыка</h2></section>
+      <section id="profile" class="section"><h2 class="section-title">Профиль: {{ session.username }}</h2></section>
     </div>
   </div>
 
@@ -145,7 +117,6 @@
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
     }
-    function toggleMobileMenu() { document.getElementById('navLinks').classList.toggle('active'); }
   </script>
 </body>
 </html>
