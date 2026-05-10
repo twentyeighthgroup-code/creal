@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
-from functools import wraps # Добавили для защиты страниц
+from functools import wraps
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
@@ -12,13 +13,13 @@ db = SQLAlchemy(app)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
+    password = db.Column(db.String(200), nullable=False) # Увеличил размер для хэша
     language = db.Column(db.String(10), nullable=False, default='ru')
 
 with app.app_context():
     db.create_all()
 
-# Декоратор для защиты страниц (если не залогинен - перекидывает на регистрацию)
+# Декоратор для защиты страниц
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -28,13 +29,13 @@ def login_required(f):
     return decorated_function
 
 @app.route('/')
-@login_required # Теперь главная доступна только после входа
+@login_required 
 def home():
     return render_template('index.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if 'username' in session: # Если уже залогинен, не пускаем на страницу регистрации
+    if 'username' in session: 
         return redirect(url_for('home'))
         
     error = None
@@ -42,10 +43,13 @@ def register():
         username = request.form['username']
         password = request.form['password']
         language = request.form['language']
+        
         if User.query.filter_by(username=username).first():
             error = 'Пользователь уже существует!' if session.get('language', 'ru') == 'ru' else 'User already exists!'
         else:
-            new_user = User(username=username, password=password, language=language)
+            # Хэшируем пароль
+            hashed_password = generate_password_hash(password)
+            new_user = User(username=username, password=hashed_password, language=language)
             db.session.add(new_user)
             db.session.commit()
             session['username'] = username
@@ -62,8 +66,12 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user = User.query.filter_by(username=username, password=password).first()
-        if user:
+        
+        # Ищем пользователя по имени
+        user = User.query.filter_by(username=username).first()
+        
+        # Проверяем пароль через хэш
+        if user and check_password_hash(user.password, password):
             session['username'] = user.username
             session['language'] = user.language
             return redirect(url_for('home'))
