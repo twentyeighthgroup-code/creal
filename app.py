@@ -10,6 +10,16 @@ app.config['SECRET_KEY'] = 'supersecretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///users.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+with app.app_context():
+    # Временный хак: удаляем таблицу Post, если она существует, 
+    # чтобы создать её заново с новыми полями
+    try:
+        Post.__table__.drop(db.engine)
+        print("Таблица Post успешно удалена для обновления!")
+    except:
+        print("Таблица Post не найдена или уже удалена.")
+    
+    db.create_all()
 
 # Модель пользователя
 class User(db.Model):
