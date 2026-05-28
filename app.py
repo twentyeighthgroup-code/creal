@@ -27,6 +27,12 @@ class Post(db.Model):
     category = db.Column(db.String(20), default='news')
     timestamp = db.Column(db.DateTime, default=datetime.utcnow) # Время публикации
 
+
+class Like(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+
 with app.app_context():
     db.create_all()
 
@@ -57,6 +63,24 @@ def add_post():
         db.session.add(new_post)
         db.session.commit()
         flash('Пост успешно опубликован!', 'success')
+    return redirect(url_for('home'))
+
+@app.route('/like_post/<int:post_id>', methods=['POST'])
+@login_required
+def like_post(post_id):
+    # Находим текущего пользователя по имени из сессии
+    user = User.query.filter_by(username=session['username']).first()
+    
+    # Проверяем, есть ли уже лайк от этого пользователя
+    existing_like = Like.query.filter_by(user_id=user.id, post_id=post_id).first()
+    
+    if existing_like:
+        db.session.delete(existing_like) # Убираем лайк
+    else:
+        new_like = Like(user_id=user.id, post_id=post_id) # Ставим лайк
+        db.session.add(new_like)
+    
+    db.session.commit()
     return redirect(url_for('home'))
 
 @app.route('/delete_post/<int:post_id>', methods=['POST'])
