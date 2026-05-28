@@ -1,6 +1,6 @@
 import os
 from datetime import datetime # Добавили импорт времени
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -56,6 +56,7 @@ def add_post():
         new_post = Post(title=title, content=content, category=category, author=session['username'])
         db.session.add(new_post)
         db.session.commit()
+        flash('Пост успешно опубликован!', 'success')
     return redirect(url_for('home'))
 
 @app.route('/delete_post/<int:post_id>', methods=['POST'])
@@ -66,6 +67,7 @@ def delete_post(post_id):
     if post.author == session['username']:
         db.session.delete(post)
         db.session.commit()
+        flash('Пост удален.', 'warning')
     return redirect(url_for('home'))
 
 @app.route('/register', methods=['GET', 'POST'])
