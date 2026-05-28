@@ -25,7 +25,8 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     author = db.Column(db.String(80), nullable=False)
     category = db.Column(db.String(20), default='news')
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow) # Время публикации
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    likes = db.relationship('Like', backref='post', lazy=True)
 
 
 class Like(db.Model):
