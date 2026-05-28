@@ -97,24 +97,35 @@
             <button type="submit" class="btn">Опубликовать</button>
         </form>
         <div class="card-grid">
-            {% for post in posts %}
-              <div class="card">
-                <h3>{{ post.title }}</h3>
-                <p style="margin: 10px 0;">{{ post.content }}</p>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                    <small style="color:var(--accent-gold);">{{ post.author }} | {{ post.timestamp.strftime('%d.%m %H:%M') }}</small>
-                    {% if post.author == session.get('username') %}
-                    <form action="/delete_post/{{ post.id }}" method="POST">
-                        <button type="submit" style="background:none; border:none; color:#ff4d4d; cursor:pointer;" title="Удалить"><i class="fas fa-trash"></i></button>
-                    </form>
-                    {% endif %}
-                </div>
-              </div>
-            {% endfor %}
+    {% for post in posts %}
+      <div class="card">
+        <h3>{{ post.title }}</h3>
+        <p style="margin: 10px 0;">{{ post.content }}</p>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+            <small style="color:var(--accent-gold);">{{ post.author }}</small>
+            
+            <div style="display: flex; gap: 10px;">
+                <!-- Кнопка лайка -->
+                <form action="/like_post/{{ post.id }}" method="POST">
+                    <button type="submit" style="background:none; border:none; color:var(--accent-gold); cursor:pointer;">
+                        <i class="fas fa-heart"></i> {{ post.likes|length }}
+                    </button>
+                </form>
+
+                <!-- Кнопка удаления (только для автора) -->
+                {% if post.author == session.get('username') %}
+                <form action="/delete_post/{{ post.id }}" method="POST">
+                    <button type="submit" style="background:none; border:none; color:#ff4d4d; cursor:pointer;" title="Удалить">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+                {% endif %}
+            </div>
         </div>
-      </section>
-    </div>
-  </div>
+      </div>
+    {% endfor %}
+</div>
 
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <script>
