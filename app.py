@@ -10,6 +10,10 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///users.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Настройка папки для загрузки аватарок
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+
+
 db = SQLAlchemy(app)
 
 # Модель пользователя
@@ -53,6 +57,20 @@ def home():
     all_posts = Post.query.order_by(Post.timestamp.desc()).all()
     user = User.query.filter_by(username=session['username']).first() # Получаем юзера
     return render_template('index.html', posts=all_posts, user=user) # Передаем юзера
+
+@app.route('/upload_avatar', methods=['POST'])
+@login_required
+def upload_avatar():
+    if 'file' in request.files:
+        file = request.files['file']
+        if file and file.filename != '':
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            
+            user = User.query.filter_by(username=session['username']).first()
+            user.avatar_filename = filename
+            db.session.commit()
+    return redirect(url_for('home'))
 
 @app.route('/add_post', methods=['POST'])
 @login_required
