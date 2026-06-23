@@ -8,13 +8,14 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///users.db')
+app.config['SQLALCHEMY_DATABASE_URL'] = os.environ.get('DATABASE_URL', 'sqlite:///users.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Настройка папки для загрузки аватарок
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 
 db = SQLAlchemy(app)
+print(f"--- БАЗА ДАННЫХ: {app.config['SQLALCHEMY_DATABASE_URL']} ---")
 
 # Модель пользователя
 class User(db.Model):
@@ -114,11 +115,9 @@ def like_post(post_id):
 @login_required
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
-    # Удалять может только автор
     if post.author == session['username']:
         db.session.delete(post)
         db.session.commit()
-        flash('Пост удален.', 'warning')
     return redirect(url_for('home'))
 
 @app.route('/register', methods=['GET', 'POST'])
