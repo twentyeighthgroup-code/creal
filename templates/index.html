@@ -92,8 +92,12 @@
     <div class="profile-header">
         <!-- Показываем аватарку -->
         <div class="avatar" style="background: none; box-shadow: none;">
-            <img src="{{ url_for('static', filename='uploads/' + user.avatar_filename) }}" 
-                 style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-gold);">
+            {% if user %}
+    <img src="{{ url_for('static', filename='uploads/' + user.avatar_filename) }}" 
+         style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-gold);">
+{% else %}
+    <i class="fas fa-user" style="font-size: 80px; color: var(--accent-gold);"></i>
+{% endif %}
         </div>
         
         <h2 class="section-title">{{ session.get('username') }}</h2>
