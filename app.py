@@ -33,13 +33,15 @@ class Post(db.Model):
     author = db.Column(db.String(80), nullable=False)
     category = db.Column(db.String(20), default='news')
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    likes = db.relationship('Like', backref='post', lazy=True)
+    # Связь с лайками с каскадным удалением
+    likes = db.relationship('Like', backref='post', lazy=True, cascade="all, delete-orphan")
 
 
 class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    # Здесь ondelete='CASCADE' говорит базе данных удалить лайки при удалении поста
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id', ondelete='CASCADE'), nullable=False)
 
 with app.app_context():
     db.create_all()
