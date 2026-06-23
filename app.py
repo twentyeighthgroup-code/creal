@@ -55,8 +55,14 @@ def login_required(f):
 @login_required 
 def home():
     all_posts = Post.query.order_by(Post.timestamp.desc()).all()
-    user = User.query.filter_by(username=session['username']).first() # Получаем юзера
-    return render_template('index.html', posts=all_posts, user=user) # Передаем юзера
+    user = User.query.filter_by(username=session['username']).first()
+    
+    # Если пользователь в сессии, но его нет в базе (после удаления базы)
+    if not user:
+        session.pop('username', None)
+        return redirect(url_for('register'))
+        
+    return render_template('index.html', posts=all_posts, user=user)
 
 @app.route('/upload_avatar', methods=['POST'])
 @login_required
