@@ -8,14 +8,14 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
-app.config['SQLALCHEMY_DATABASE_URL'] = os.environ.get('DATABASE_URL', 'sqlite:///users.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///users.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Настройка папки для загрузки аватарок
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 
 db = SQLAlchemy(app)
-print(f"--- БАЗА ДАННЫХ: {app.config['SQLALCHEMY_DATABASE_URL']} ---")
+print(f"--- БАЗА ДАННЫХ: {app.config['SQLALCHEMY_DATABASE_URI']} ---")
 
 # Модель пользователя
 class User(db.Model):
