@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
@@ -17,6 +18,7 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False) 
     language = db.Column(db.String(10), nullable=False, default='ru')
+    avatar_filename = db.Column(db.String(120), default='default.png') # Новое поле
 
 # Модель поста
 class Post(db.Model):
@@ -48,9 +50,9 @@ def login_required(f):
 @app.route('/')
 @login_required 
 def home():
-    # Получаем все посты, отсортированные от новых к старым
     all_posts = Post.query.order_by(Post.timestamp.desc()).all()
-    return render_template('index.html', posts=all_posts)
+    user = User.query.filter_by(username=session['username']).first() # Получаем юзера
+    return render_template('index.html', posts=all_posts, user=user) # Передаем юзера
 
 @app.route('/add_post', methods=['POST'])
 @login_required
