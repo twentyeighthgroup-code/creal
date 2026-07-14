@@ -2,53 +2,391 @@
 <html lang="{{ session.get('language', 'ru') }}">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Creal - Register</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Creal | Регистрация</title>
+  
+  <!-- Шрифты и иконки -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
+    /* --- 1. CSS Variables (Единая дизайн-система) --- */
     :root {
-      --primary-dark: #001f3f;
+      --bg-dark: #050a14;
+      --bg-gradient: radial-gradient(circle at 10% 20%, rgba(0, 64, 128, 0.4) 0%, transparent 40%),
+                     radial-gradient(circle at 90% 80%, rgba(255, 204, 51, 0.1) 0%, transparent 40%),
+                     linear-gradient(135deg, #001226 0%, #001f3f 100%);
       --accent-blue: #4cc9f0;
       --accent-gold: #ffcc33;
-      --glass-bg: rgba(0, 30, 60, 0.7);
-      --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+      --accent-gold-glow: rgba(255, 204, 51, 0.4);
+      --danger: #ff4d4d;
+      
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+      --glass-highlight: 1px solid rgba(255, 255, 255, 0.15);
+      --backdrop-blur: blur(24px);
+      
+      --radius-sm: 12px;
+      --radius-md: 24px;
+      
+      --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --shadow-glow: 0 0 30px rgba(76, 201, 240, 0.1);
+      
+      --transition-smooth: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, var(--primary-dark), #002b5c); color: white; min-height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; }
-    .card { background: var(--glass-bg); backdrop-filter: blur(16px); border: var(--glass-border); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .logo-img { width: 80px; height: 80px; margin-bottom: 1.5rem; border-radius: 15px; border: 2px solid var(--accent-gold); }
-    .form-group { margin-bottom: 1.5rem; text-align: left; }
-    .form-control { width: 100%; padding: 0.9rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; margin-top: 5px; }
-    .btn { width: 100%; padding: 1rem; background: linear-gradient(90deg, var(--accent-blue), var(--accent-gold)); border: none; border-radius: 50px; color: var(--primary-dark); font-weight: 700; cursor: pointer; transition: 0.3s; }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 204, 51, 0.3); }
-    .error { color: #ff4d4d; margin-bottom: 1rem; font-size: 0.9rem; }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: var(--bg-dark);
+      background-image: var(--bg-gradient);
+      background-attachment: fixed;
+      color: #f8f9fa; 
+      min-height: 100vh; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      padding: 1.5rem;
+      overflow: hidden;
+    }
+
+    /* Анимированные фоновые элементы */
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: -1;
+      animation: float 10s infinite ease-in-out;
+    }
+    .orb-1 { width: 300px; height: 300px; background: rgba(76, 201, 240, 0.15); top: -50px; left: -50px; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(255, 204, 51, 0.1); bottom: -100px; right: -100px; animation-delay: -5s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(30px, -30px); }
+    }
+
+    /* --- 2. Register Card --- */
+    .register-card { 
+      background: var(--glass-bg); 
+      backdrop-filter: var(--backdrop-blur);
+      -webkit-backdrop-filter: var(--backdrop-blur);
+      border: var(--glass-border);
+      border-top: var(--glass-highlight);
+      border-radius: var(--radius-md); 
+      padding: 3rem 2.5rem; 
+      width: 100%; 
+      max-width: 440px; /* Чуть шире для удобства */
+      text-align: center; 
+      box-shadow: var(--shadow-md), var(--shadow-glow);
+      animation: fadeInUp 0.8s var(--transition-smooth) forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo-img { 
+      width: 70px; 
+      height: 70px; 
+      margin-bottom: 1.5rem; 
+      border-radius: 16px; 
+      border: 2px solid var(--accent-gold); 
+      box-shadow: 0 0 20px var(--accent-gold-glow);
+      object-fit: cover;
+    }
+
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, #fff, var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .card-subtitle {
+      color: #adb5bd;
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+
+    /* --- 3. Forms & Inputs --- */
+    .form-group { 
+      margin-bottom: 1.25rem; 
+      text-align: left; 
+      position: relative;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #cbd5e1;
+      margin-bottom: 0.5rem;
+      margin-left: 4px;
+    }
+
+    .input-wrapper { position: relative; }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.4);
+      transition: var(--transition-fast);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .form-control { 
+      width: 100%; 
+      padding: 0.9rem 1rem 0.9rem 2.8rem; 
+      background: rgba(0, 0, 0, 0.25); 
+      border: 1px solid rgba(255, 255, 255, 0.1); 
+      border-radius: var(--radius-sm); 
+      color: white; 
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      transition: var(--transition-fast);
+      outline: none;
+    }
+
+    .form-control:focus { 
+      border-color: var(--accent-blue); 
+      box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.15); 
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .form-control:focus ~ .input-icon { color: var(--accent-blue); }
+    .form-control::placeholder { color: rgba(255, 255, 255, 0.3); }
+
+    /* Стилизация Select (Выпадающий список) */
+    select.form-control {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      cursor: pointer;
+      padding-right: 2.8rem; /* Место для иконки стрелки */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234cc9f0' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+    }
+    
+    /* Стили для опций внутри select (для темной темы) */
+    select.form-control option {
+      background-color: #001f3f;
+      color: white;
+      padding: 10px;
+    }
+
+    /* Кнопка показа пароля */
+    .toggle-password {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      padding: 4px;
+      z-index: 2;
+    }
+    .toggle-password:hover { color: white; }
+
+    /* --- 4. Buttons --- */
+    .btn { 
+      width: 100%; 
+      padding: 1rem; 
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-gold)); 
+      border: none; 
+      border-radius: 50px; 
+      color: #001226; 
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; 
+      font-size: 1.05rem;
+      cursor: pointer; 
+      transition: var(--transition-smooth);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 1rem;
+    }
+    
+    .btn:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 8px 25px var(--accent-gold-glow); 
+    }
+    .btn:active { transform: translateY(0); }
+
+    /* --- 5. Error Messages --- */
+    .error-alert {
+      background: rgba(255, 77, 77, 0.1);
+      border: 1px solid rgba(255, 77, 77, 0.3);
+      border-left: 4px solid var(--danger);
+      color: #ffcdd2;
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    /* --- 6. Footer Link --- */
+    .card-footer {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.9rem;
+      color: #adb5bd;
+    }
+    
+    .card-footer a {
+      color: var(--accent-gold);
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition-fast);
+      position: relative;
+    }
+    
+    .card-footer a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -2px;
+      left: 0;
+      background-color: var(--accent-gold);
+      transition: var(--transition-fast);
+    }
+    
+    .card-footer a:hover::after { width: 100%; }
+    .card-footer a:hover { color: #fff; }
+
+    /* --- 7. Responsive --- */
+    @media (max-width: 480px) {
+      .register-card { padding: 2rem 1.5rem; }
+      .card-title { font-size: 1.5rem; }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-img">
-    <h2>{% if session.get('language', 'ru') == 'ru' %}Создать аккаунт{% else %}Create Account{% endif %}</h2>
-    {% if error %}<p class="error">{{ error }}</p>{% endif %}
-    <form method="POST">
-        <div class="form-group">
-          <label for="username">{% if session.get('language', 'ru') == 'ru' %}Имя пользователя{% else %}Username{% endif %}</label>
-          <input type="text" id="username" name="username" class="form-control" required>
-        </div>
-        <div class="form-group">
-          <label for="password">{% if session.get('language', 'ru') == 'ru' %}Пароль{% else %}Password{% endif %}</label>
-          <input type="password" id="password" name="password" class="form-control" required>
-        </div>
-         <div class="form-group">
-          <label for="language">{% if session.get('language', 'ru') == 'ru' %}Язык{% else %}Language{% endif %}</label>
-          <select id="language" name="language" class="form-control" required>
-            <option value="ru">Русский</option>
-            <option value="en">English</option>
-          </select>
-        </div>
-        <button type="submit" class="btn">{% if session.get('language', 'ru') == 'ru' %}Зарегистрироваться{% else %}Sign Up{% endif %}</button>
-    </form>
-    <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-gray);">
-        {% if session.get('language', 'ru') == 'ru' %}Уже есть аккаунт? <a href="/login" style="color: var(--accent-gold);">Войти</a>{% else %}Already have an account? <a href="/login" style="color: var(--accent-gold);">Log In</a>{% endif %}
+
+  <!-- Фоновые анимированные элементы -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <div class="register-card">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Creal Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/70/ffcc33/001226?text=C'">
+    
+    <h1 class="card-title">
+      {% if session.get('language', 'ru') == 'ru' %}Создать аккаунт{% else %}Create Account{% endif %}
+    </h1>
+    <p class="card-subtitle">
+      {% if session.get('language', 'ru') == 'ru' %}Присоединяйтесь к экосистеме Creal{% else %}Join the Creal ecosystem today{% endif %}
     </p>
+
+    {% if error %}
+      <div class="error-alert">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>{{ error }}</span>
+      </div>
+    {% endif %}
+
+    <form method="POST" action="/register" autocomplete="on">
+      <div class="form-group">
+        <label class="form-label" for="username">
+          {% if session.get('language', 'ru') == 'ru' %}Имя пользователя{% else %}Username{% endif %}
+        </label>
+        <div class="input-wrapper">
+          <input type="text" id="username" name="username" class="form-control" placeholder="user" required autofocus autocomplete="username">
+          <i class="fas fa-user input-icon"></i>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">
+          {% if session.get('language', 'ru') == 'ru' %}Пароль{% else %}Password{% endif %}
+        </label>
+        <div class="input-wrapper">
+          <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="new-password">
+          <i class="fas fa-lock input-icon"></i>
+          <button type="button" class="toggle-password" onclick="togglePassword()" aria-label="Toggle password visibility">
+            <i class="fas fa-eye" id="toggleIcon"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="language">
+          {% if session.get('language', 'ru') == 'ru' %}Язык интерфейса{% else %}Interface Language{% endif %}
+        </label>
+        <div class="input-wrapper">
+          <select id="language" name="language" class="form-control" required>
+            <option value="ru" {% if session.get('language', 'ru') == 'ru' %}selected{% endif %}>🇷🇺 Русский</option>
+            <option value="en" {% if session.get('language', 'ru') == 'en' %}selected{% endif %}>🇬🇧 English</option>
+          </select>
+          <i class="fas fa-globe input-icon"></i>
+        </div>
+      </div>
+
+      <button type="submit" class="btn">
+        <span>{% if session.get('language', 'ru') == 'ru' %}Зарегистрироваться{% else %}Sign Up{% endif %}</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </form>
+
+    <div class="card-footer">
+      {% if session.get('language', 'ru') == 'ru' %}
+        Уже есть аккаунт? <a href="/login">Войти в систему</a>
+      {% else %}
+        Already have an account? <a href="/login">Log In</a>
+      {% endif %}
+    </div>
   </div>
+
+  <script>
+    // Функция показа/скрытия пароля
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const toggleIcon = document.getElementById('toggleIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+      }
+    }
+
+    // Автофокус на поле username при загрузке
+    document.addEventListener('DOMContentLoaded', () => {
+      const usernameInput = document.getElementById('username');
+      if (usernameInput && !usernameInput.value) {
+        usernameInput.focus();
+      }
+    });
+  </script>
 </body>
 </html>
