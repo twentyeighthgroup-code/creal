@@ -124,7 +124,6 @@
       padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;
       opacity: 0; animation: slideUpFade 0.5s ease forwards;
     }
-    /* Staggered animation for cards via JS or inline style */
     
     .card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; margin-bottom: 0.75rem; color: white; }
     .card p { color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; flex-grow: 1; }
@@ -213,7 +212,7 @@
     /* --- 10. Responsive --- */
     @media (max-width: 768px) {
       nav { padding: 0.8rem 1rem; }
-      .nav-brand span { display: none; } /* Скрыть текст на мобильных, оставить лого */
+      .nav-brand span { display: none; }
       .nav-links a { padding: 0.5rem 0.8rem; font-size: 0.85rem; }
       .card-grid { grid-template-columns: 1fr; }
     }
@@ -360,10 +359,10 @@
     </div>
   </div>
 
-  <!-- Scripts -->
+  <!-- Scripts: AJAX & UI Logic -->
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <script>
-    // 1. Инициализация частиц (оптимизированная)
+    // --- 1. Инициализация частиц ---
     particlesJS("particles-js", {
       particles: {
         number: { value: 40, density: { enable: true, value_area: 800 } },
@@ -382,48 +381,229 @@
       retina_detect: true
     });
 
-    // 2. Управление секциями (SPA-подобное поведение)
+    // --- 2. Управление секциями (SPA-подобное поведение) ---
     function showSection(id) {
-      // Скрыть все секции
       document.querySelectorAll('.section').forEach(s => {
         s.classList.remove('active');
-        s.style.display = 'none'; // Сброс для перезапуска анимации
+        s.style.display = 'none';
       });
-      
-      // Убрать активный класс у ссылок
       document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
       
-      // Показать нужную секцию с небольшой задержкой для перезапуска CSS-анимации
       setTimeout(() => {
         const target = document.getElementById(id);
         target.style.display = 'block';
-        // Форсируем reflow
-        void target.offsetWidth; 
+        void target.offsetWidth; // Форсируем reflow для анимации
         target.classList.add('active');
       }, 10);
 
-      // Обновить навигацию
       const navLink = document.getElementById('nav-' + id);
       if (navLink) navLink.classList.add('active');
     }
 
-    // 3. Авто-скрытие Toast-уведомлений
-    document.addEventListener('DOMContentLoaded', () => {
-      const toasts = document.querySelectorAll('.toast');
-      toasts.forEach(toast => {
-        setTimeout(() => {
-          toast.style.opacity = '0';
-          toast.style.transform = 'translateX(100%)';
-          setTimeout(() => toast.remove(), 400);
-        }, 4000); // 4 секунды
-      });
-    });
-
-    // 4. Улучшение UX загрузки файла
+    // --- 3. Улучшение UX загрузки файла ---
     function updateFileName(input) {
       const fileName = input.files[0] ? input.files[0].name : 'Выберите изображение';
       document.getElementById('fileName').textContent = fileName;
     }
+
+    // --- 4. AJAX Helper: Показ уведомлений ---
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i><span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0'; 
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 400);
+      }, 4000);
+    }
+
+    // Авто-скрытие начальных Toast-уведомлений (от Flask)
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.toast').forEach(toast => {
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateX(100%)';
+          setTimeout(() => toast.remove(), 400);
+        }, 4000);
+      });
+    });
+
+    // --- 5. Глобальный делегат событий для AJAX форм ---
+    document.addEventListener('submit', async function(e) {
+      const form = e.target;
+      const action = form.getAttribute('action') || form.action;
+
+      // A. Добавление поста
+      if (action === '/add_post') {
+        e.preventDefault();
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Публикация...';
+        btn.disabled = true;
+
+        const formData = new FormData(form);
+        try {
+          const response = await fetch('/add_post', {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          });
+          const data = await response.json();
+
+          if (data.success) {
+            showToast(data.message, 'success');
+            form.reset();
+            
+            const grid = document.querySelector('.card-grid');
+            const emptyState = grid.querySelector('.glass-panel[style*="text-align: center"]');
+            if (emptyState) emptyState.remove();
+
+            const newCard = document.createElement('div');
+            newCard.className = 'glass-panel card';
+            newCard.style.animation = 'slideUpFade 0.5s ease forwards';
+            newCard.innerHTML = `
+              <div>
+                <h3>${data.post.title}</h3>
+                <p>${data.post.content}</p>
+              </div>
+              <div class="card-footer">
+                <div class="author-badge">
+                  <i class="fas fa-user-circle"></i> ${data.post.author}
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <form action="/like_post/${data.post.id}" method="POST" style="margin:0;">
+                    <button type="submit" class="btn btn-icon like-btn" title="Нравится">
+                      <i class="far fa-heart"></i> <span class="like-count" style="font-size: 0.85rem; margin-left: 4px;">0</span>
+                    </button>
+                  </form>
+                  <form action="/delete_post/${data.post.id}" method="POST" style="margin:0;">
+                    <button type="submit" class="btn btn-icon btn-danger" title="Удалить">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            `;
+            grid.prepend(newCard);
+          } else {
+            showToast(data.message || 'Ошибка', 'error');
+          }
+        } catch (err) {
+          showToast('Ошибка сети', 'error');
+        } finally {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      }
+
+      // B. Лайки
+      if (action.includes('/like_post/')) {
+        e.preventDefault();
+        const btn = form.querySelector('button');
+        const icon = btn.querySelector('i');
+        const countSpan = btn.querySelector('span');
+        
+        btn.disabled = true;
+        try {
+          const response = await fetch(action, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          });
+          const data = await response.json();
+          if (data.success) {
+            countSpan.textContent = data.likes_count;
+            if (data.is_liked) {
+              icon.classList.remove('far');
+              icon.classList.add('fas');
+            } else {
+              icon.classList.remove('fas');
+              icon.classList.add('far');
+            }
+          } else {
+            showToast(data.message, 'error');
+          }
+        } catch (err) {
+          showToast('Ошибка сети', 'error');
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      // C. Удаление поста
+      if (action.includes('/delete_post/')) {
+        e.preventDefault();
+        if (!confirm('Вы уверены, что хотите удалить эту запись?')) return;
+        
+        const card = form.closest('.card');
+        try {
+          const response = await fetch(action, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          });
+          const data = await response.json();
+          if (data.success) {
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+              card.remove();
+              showToast(data.message, 'success');
+              
+              const grid = document.querySelector('.card-grid');
+              const hasPosts = Array.from(grid.children).some(child => !child.querySelector('.fa-inbox'));
+              if (!hasPosts) {
+                grid.innerHTML = `
+                  <div class="glass-panel" style="padding: 3rem; text-align: center; grid-column: 1 / -1;">
+                    <i class="fas fa-inbox" style="font-size: 3rem; color: rgba(255,255,255,0.2); margin-bottom: 1rem;"></i>
+                    <p style="color: #adb5bd;">Пока нет новостей. Будьте первым!</p>
+                  </div>`;
+              }
+            }, 300);
+          } else {
+            showToast(data.message, 'error');
+          }
+        } catch (err) {
+          showToast('Ошибка сети', 'error');
+        }
+      }
+
+      // D. Загрузка аватара
+      if (action === '/upload_avatar') {
+        e.preventDefault();
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Загрузка...';
+        btn.disabled = true;
+
+        const formData = new FormData(form);
+        try {
+          const response = await fetch('/upload_avatar', {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          });
+          const data = await response.json();
+          if (data.success) {
+            showToast(data.message, 'success');
+            const avatarImg = document.querySelector('.avatar-img');
+            if (avatarImg && data.avatar_url) {
+              avatarImg.src = data.avatar_url + '?t=' + new Date().getTime();
+            }
+            document.getElementById('fileName').textContent = 'Выберите изображение';
+            form.reset();
+          } else {
+            showToast(data.message, 'error');
+          }
+        } catch (err) {
+          showToast('Ошибка сети', 'error');
+        } finally {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      }
+    });
   </script>
 </body>
 </html>
