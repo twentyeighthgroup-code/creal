@@ -203,43 +203,88 @@ def delete_post(post_id):
 # ... (маршруты register, login, switch_language, logout остаются без изменений, они и так работают отлично) ...
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if 'username' in session: return redirect(url_for('home'))
+    if 'username' in session:
+        return redirect(url_for('home'))
+        
     error = None
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
         language = request.form.get('language', 'ru')
-        if not username or not password: error = 'Имя пользователя и пароль обязательны!'
-        elif len(username) < 3: error = 'Имя пользователя должно содержать минимум 3 символа!'
-        elif len(password) < 6: error = 'Пароль должен содержать минимум 6 символов!'
-        elif User.query.filter_by(username=username).first(): error = 'Пользователь уже существует!'
+        
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
+        # Валидация
+        if not username or not password:
+            error = 'Имя пользователя и пароль обязательны для заполнения!'
+        elif len(username) < 3:
+            error = 'Имя пользователя должно содержать минимум 3 символа!'
+        elif len(password) < 6:
+            error = 'Пароль должен содержать минимум 6 символов!'
+        elif User.query.filter_by(username=username).first():
+            error = 'Пользователь с таким именем уже существует!'
         else:
             try:
-                new_user = User(username=username, password=generate_password_hash(password), language=language)
+                hashed_password = generate_password_hash(password)
+                new_user = User(username=username, password=hashed_password, language=language)
                 db.session.add(new_user)
                 db.session.commit()
+                
                 session['username'] = username
                 session['language'] = language
-                flash('Регистрация прошла успешно!', 'success')
+                
+                if is_ajax:
+                    return jsonify({
+                        'success': True, 
+                        'message': 'Регистрация прошла успешно! Добро пожаловать.', 
+                        'redirect_url': url_for('home')
+                    })
+                    
+                flash('Регистрация прошла успешно! Добро пожаловать.', 'success')
                 return redirect(url_for('home'))
+                
             except Exception:
                 db.session.rollback()
-                error = 'Ошибка при регистрации.'
+                error = 'Произошла ошибка при регистрации. Попробуйте позже.'
+        
+        # Если мы здесь, значит была ошибка валидации
+        if is_ajax:
+            return jsonify({'success': False, 'message': error})
+            
     return render_template('register.html', error=error)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if 'username' in session: return redirect(url_for('home'))
+    if 'username' in session:
+        return redirect(url_for('home'))
+        
     error = None
     if request.method == 'POST':
-        user = User.query.filter_by(username=request.form.get('username', '').strip()).first()
-        if user and check_password_hash(user.password, request.form.get('password', '')):
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+        
+        user = User.query.filter_by(username=username).first()
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
+        if user and check_password_hash(user.password, password):
             session['username'] = user.username
             session['language'] = user.language
+            
+            if is_ajax:
+                return jsonify({
+                    'success': True, 
+                    'message': 'Вы успешно вошли в систему!', 
+                    'redirect_url': url_for('home')
+                })
+                
             flash('Вы успешно вошли в систему!', 'success')
             return redirect(url_for('home'))
         else:
             error = 'Неверное имя пользователя или пароль!'
+            if is_ajax:
+                return jsonify({'success': False, 'message': error})
+                
     return render_template('login.html', error=error)
 
 @app.route('/switch_language', methods=['GET'])
