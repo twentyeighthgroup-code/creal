@@ -672,5 +672,90 @@
       }
     });
   </script>
+        
+    // Обновление имени файла для видео
+    function updateCrealFileName(input) {
+      const fileName = input.files[0] ? input.files[0].name : 'Выберите видео (MP4, MOV, WEBM до 50 МБ)';
+      document.getElementById('crealFileName').textContent = fileName;
+    }
+
+    // AJAX загрузка Creal
+    const crealForm = document.querySelector('form[action="/upload_creal"]');
+    if (crealForm) {
+      crealForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('uploadCrealBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Загрузка видео...';
+        btn.disabled = true;
+
+        const formData = new FormData(this);
+        try {
+          const response = await fetch('/upload_creal', {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          });
+          const data = await response.json();
+
+          if (data.success) {
+            showToast(data.message, 'success');
+            this.reset();
+            document.getElementById('crealFileName').textContent = 'Выберите видео (MP4, MOV, WEBM до 50 МБ)';
+            
+            // Добавляем новый Creal в сетку
+            const grid = document.getElementById('crealsGrid');
+            // Удаляем заглушку "Загрузка", если она есть
+            const placeholder = grid.querySelector('.fa-film');
+            if (placeholder) placeholder.closest('.card').remove();
+
+            const newCard = document.createElement('div');
+            newCard.className = 'glass-panel card';
+            newCard.style.animation = 'slideUpFade 0.5s ease forwards';
+            newCard.innerHTML = `
+              <video src="${data.creal.video_url}" controls style="width: 100%; border-radius: 12px; margin-bottom: 1rem; background: #000;"></video>
+              <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 1rem;">${data.creal.description || ''}</p>
+              <div class="card-footer">
+                <div class="author-badge"><i class="fas fa-user-circle"></i> ${data.creal.author}</div>
+                <form action="/like_creal/${data.creal.id}" method="POST" style="margin:0;">
+                  <button type="submit" class="btn btn-icon like-btn" title="Нравится">
+                    <i class="far fa-heart"></i> <span class="like-count" style="font-size: 0.85rem; margin-left: 4px;">0</span>
+                  </button>
+                </form>
+              </div>
+            `;
+            grid.prepend(newCard);
+          } else {
+            showToast(data.message, 'error');
+          }
+        } catch (err) {
+          showToast('Ошибка сети при загрузке видео', 'error');
+        } finally {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      });
+    }
+
+    // Глобальный делегат для лайков Creals (добавьте это внутрь существующего document.addEventListener('submit', ...))
+    // Найдите в своем коде место, где обрабатываются формы, и добавьте условие:
+    /*
+      if (action.includes('/like_creal/')) {
+        e.preventDefault();
+        const btn = form.querySelector('button');
+        const icon = btn.querySelector('i');
+        const countSpan = btn.querySelector('span');
+        btn.disabled = true;
+        try {
+          const response = await fetch(action, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+          const data = await response.json();
+          if (data.success) {
+            countSpan.textContent = data.likes_count;
+            icon.className = data.is_liked ? 'fas fa-heart' : 'far fa-heart';
+          }
+        } catch (err) { showToast('Ошибка сети', 'error'); }
+        finally { btn.disabled = false; }
+      }
+    */
 </body>
 </html>
