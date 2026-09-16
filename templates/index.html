@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Creal | Tegcompany</title>
   
-  <!-- Шрифты и иконки -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
-    /* --- 1. CSS Variables & Reset --- */
     :root {
       --bg-dark: #050a14;
       --bg-gradient: radial-gradient(circle at 10% 20%, rgba(0, 64, 128, 0.4) 0%, transparent 40%),
@@ -56,7 +54,6 @@
 
     .app-container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 4rem; }
 
-    /* --- 2. Glassmorphism Utilities --- */
     .glass-panel {
       background: var(--glass-bg);
       backdrop-filter: var(--backdrop-blur);
@@ -72,7 +69,6 @@
       box-shadow: var(--shadow-md), var(--shadow-glow);
     }
 
-    /* --- 3. Navigation --- */
     nav {
       position: sticky; top: 1rem; left: 50%; transform: translateX(-50%);
       width: 100%; max-width: 1200px; 
@@ -88,10 +84,10 @@
     }
     .nav-brand img { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--accent-gold); box-shadow: 0 0 10px var(--accent-gold-glow); }
     
-    .nav-links { display: flex; gap: 0.5rem; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 50px; border: var(--glass-border); }
+    .nav-links { display: flex; gap: 0.5rem; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 50px; border: var(--glass-border); flex-wrap: wrap; }
     .nav-links a { 
-      text-decoration: none; color: var(--text-gray, #adb5bd); font-weight: 500; font-size: 0.95rem;
-      padding: 0.6rem 1.2rem; border-radius: 50px; transition: var(--transition-fast); 
+      text-decoration: none; color: #adb5bd; font-weight: 500; font-size: 0.95rem;
+      padding: 0.6rem 1.2rem; border-radius: 50px; transition: var(--transition-fast); white-space: nowrap;
     }
     .nav-links a:hover { color: white; }
     .nav-links a.active { 
@@ -99,7 +95,6 @@
       font-weight: 600; box-shadow: 0 4px 12px var(--accent-gold-glow);
     }
 
-    /* --- 4. Sections & Animations --- */
     .main-content { position: relative; }
     .section { display: none; opacity: 0; transform: translateY(20px); }
     .section.active { display: block; animation: slideUpFade 0.6s var(--transition-smooth) forwards; }
@@ -115,7 +110,6 @@
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
     }
 
-    /* --- 5. Cards & Grid --- */
     .card-grid { 
       display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
       gap: 1.5rem; margin-top: 1.5rem; 
@@ -135,7 +129,6 @@
     .author-badge { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--accent-gold); font-weight: 600; }
     .author-badge i { font-size: 0.75rem; }
 
-    /* --- 6. Forms & Inputs --- */
     .upload-form { padding: 2rem; margin-bottom: 2rem; }
     .form-group { margin-bottom: 1.25rem; }
     .form-control { 
@@ -152,7 +145,6 @@
     .form-control::placeholder { color: rgba(255, 255, 255, 0.4); }
     textarea.form-control { resize: vertical; min-height: 100px; }
 
-    /* Custom File Input */
     .file-upload-wrapper {
       position: relative; overflow: hidden; display: inline-block; width: 100%;
     }
@@ -167,7 +159,6 @@
       position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;
     }
 
-    /* --- 7. Buttons --- */
     .btn { 
       background: linear-gradient(90deg, var(--accent-blue), var(--accent-gold)); 
       color: #001226; border: none; padding: 0.9rem 2rem; border-radius: 50px; 
@@ -176,13 +167,12 @@
     }
     .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--accent-gold-glow); }
     .btn:active { transform: translateY(0); }
-    .btn-sm { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+    .btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
     .btn-icon { background: transparent; color: var(--accent-gold); padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; }
     .btn-icon:hover { background: rgba(255, 204, 51, 0.1); color: #fff; }
     .btn-danger { color: var(--danger); }
     .btn-danger:hover { background: rgba(255, 77, 77, 0.1); }
 
-    /* --- 8. Profile Specifics --- */
     .profile-header { text-align: center; padding: 3rem 1.5rem; }
     .avatar-container { position: relative; width: 150px; height: 150px; margin: 0 auto 1.5rem; }
     .avatar-img { 
@@ -196,7 +186,6 @@
     .avatar-container:hover .avatar-overlay { opacity: 1; }
     .avatar-overlay i { font-size: 1.5rem; color: white; }
 
-    /* --- 9. Toast Notifications (Flash Messages) --- */
     .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
     .toast {
       padding: 1rem 1.5rem; border-radius: var(--radius-sm); color: white; font-weight: 500;
@@ -209,18 +198,80 @@
     .toast.error { background: rgba(244, 67, 54, 0.9); border-left: 4px solid #e57373; }
     @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-    /* --- 10. Responsive --- */
+    /* Creals-specific styles */
+    .creal-video {
+      width: 100%;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+      background: #000;
+      max-height: 400px;
+      object-fit: cover;
+    }
+
+    /* About section styles */
+    .about-content {
+      padding: 3rem;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .about-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 16px;
+      border: 2px solid var(--accent-gold);
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 20px var(--accent-gold-glow);
+    }
+    .about-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: white;
+    }
+    .about-text {
+      color: #cbd5e1;
+      font-size: 1.1rem;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+    .about-text strong { color: var(--accent-gold); }
+    .about-features {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+    .about-feature {
+      text-align: center;
+      flex: 1;
+      min-width: 200px;
+    }
+    .about-feature i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .about-feature h4 {
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+    .about-feature p {
+      font-size: 0.9rem;
+      color: #adb5bd;
+    }
+
     @media (max-width: 768px) {
       nav { padding: 0.8rem 1rem; }
       .nav-brand span { display: none; }
       .nav-links a { padding: 0.5rem 0.8rem; font-size: 0.85rem; }
       .card-grid { grid-template-columns: 1fr; }
+      .about-content { padding: 2rem 1.5rem; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Toast Notifications Container -->
   <div class="toast-container" id="toastContainer">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
@@ -237,13 +288,12 @@
   <div id="particles-js"></div>
 
   <div class="app-container">
-    <!-- Navigation -->
     <nav class="glass-panel">
       <a href="#" onclick="showSection('home'); return false;" class="nav-brand">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Creal Logo" onerror="this.src='https://via.placeholder.com/40/ffcc33/001226?text=C'">
         <span>Creal</span>
       </a>
-            <div class="nav-links">
+      <div class="nav-links">
         <a href="#" onclick="showSection('home')" id="nav-home" class="active">Главная</a>
         <a href="#" onclick="showSection('news')" id="nav-news">Новости</a>
         <a href="#" onclick="showSection('creals')" id="nav-creals">Creals 🎬</a>
@@ -358,11 +408,8 @@
           {% endfor %}
         </div>
       </section>
-    </div>
-  </div>
 
-         
-             <!-- CREALS SECTION -->
+      <!-- CREALS SECTION -->
       <section id="creals" class="section">
         <h2 class="section-title">Creals 🎬</h2>
         
@@ -386,50 +433,50 @@
         {% endif %}
 
         <div class="card-grid" id="crealsGrid">
-          <!-- Здесь будут отображаться видео. Для теста добавим заглушку, если пусто -->
           <div class="glass-panel card" style="text-align: center; padding: 2rem;">
             <i class="fas fa-film" style="font-size: 3rem; color: var(--accent-blue); margin-bottom: 1rem;"></i>
-            <p>Загрузка Creals...</p>
+            <p style="color: #adb5bd;">Загрузка Creals...</p>
           </div>
         </div>
       </section>
 
-      <!-- ABOUT US SECTION -->
+      <!-- ABOUT SECTION -->
       <section id="about" class="section">
         <h2 class="section-title">О нас</h2>
-        <div class="glass-panel" style="padding: 3rem; text-align: center; max-width: 800px; margin: 0 auto;">
-          <img src="{{ url_for('static', filename='logo.png') }}" alt="Tegcompany Logo" style="width: 80px; height: 80px; border-radius: 16px; border: 2px solid var(--accent-gold); margin-bottom: 1.5rem;" onerror="this.src='https://via.placeholder.com/80/ffcc33/001226?text=T'">
+        <div class="glass-panel about-content">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="Tegcompany Logo" class="about-logo" onerror="this.src='https://via.placeholder.com/80/ffcc33/001226?text=T'">
           
-          <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; margin-bottom: 1rem; color: white;">Tegcompany</h3>
-          <p style="color: #cbd5e1; font-size: 1.1rem; line-height: 1.8; margin-bottom: 2rem;">
+          <h3 class="about-title">Tegcompany</h3>
+          <p class="about-text">
             Мы создаем инновационные цифровые решения, объединяющие людей и технологии. 
-            Проект <strong style="color: var(--accent-gold);">Creal</strong> разработан нашей командой как современная, быстрая и безопасная платформа для обмена идеями, новостями и короткими видеоформатами.
+            Проект <strong>Creal</strong> разработан нашей командой как современная, быстрая и безопасная платформа для обмена идеями, новостями и короткими видеоформатами.
           </p>
           
-          <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-top: 2rem;">
-            <div style="text-align: center;">
-              <i class="fas fa-rocket" style="font-size: 2rem; color: var(--accent-blue); margin-bottom: 0.5rem;"></i>
-              <h4 style="color: white;">Скорость</h4>
-              <p style="font-size: 0.9rem; color: #adb5bd;">Мгновенная загрузка и AJAX-интерфейс</p>
+          <div class="about-features">
+            <div class="about-feature">
+              <i class="fas fa-rocket" style="color: var(--accent-blue);"></i>
+              <h4>Скорость</h4>
+              <p>Мгновенная загрузка и AJAX-интерфейс</p>
             </div>
-            <div style="text-align: center;">
-              <i class="fas fa-shield-alt" style="font-size: 2rem; color: var(--accent-gold); margin-bottom: 0.5rem;"></i>
-              <h4 style="color: white;">Безопасность</h4>
-              <p style="font-size: 0.9rem; color: #adb5bd;">Надежное шифрование и защита данных</p>
+            <div class="about-feature">
+              <i class="fas fa-shield-alt" style="color: var(--accent-gold);"></i>
+              <h4>Безопасность</h4>
+              <p>Надежное шифрование и защита данных</p>
             </div>
-            <div style="text-align: center;">
-              <i class="fas fa-paint-brush" style="font-size: 2rem; color: var(--success); margin-bottom: 0.5rem;"></i>
-              <h4 style="color: white;">Дизайн</h4>
-              <p style="font-size: 0.9rem; color: #adb5bd;">Современный glassmorphism и адаптивность</p>
+            <div class="about-feature">
+              <i class="fas fa-paint-brush" style="color: var(--success);"></i>
+              <h4>Дизайн</h4>
+              <p>Современный glassmorphism и адаптивность</p>
             </div>
           </div>
         </div>
       </section>
-  
-  <!-- Scripts: AJAX & UI Logic -->
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <script>
-    // --- 1. Инициализация частиц ---
+    // 1. Инициализация частиц
     particlesJS("particles-js", {
       particles: {
         number: { value: 40, density: { enable: true, value_area: 800 } },
@@ -448,7 +495,7 @@
       retina_detect: true
     });
 
-    // --- 2. Управление секциями (SPA-подобное поведение) ---
+    // 2. Управление секциями
     function showSection(id) {
       document.querySelectorAll('.section').forEach(s => {
         s.classList.remove('active');
@@ -459,7 +506,7 @@
       setTimeout(() => {
         const target = document.getElementById(id);
         target.style.display = 'block';
-        void target.offsetWidth; // Форсируем reflow для анимации
+        void target.offsetWidth;
         target.classList.add('active');
       }, 10);
 
@@ -467,13 +514,18 @@
       if (navLink) navLink.classList.add('active');
     }
 
-    // --- 3. Улучшение UX загрузки файла ---
+    // 3. Утилиты для файлов
     function updateFileName(input) {
       const fileName = input.files[0] ? input.files[0].name : 'Выберите изображение';
       document.getElementById('fileName').textContent = fileName;
     }
 
-    // --- 4. AJAX Helper: Показ уведомлений ---
+    function updateCrealFileName(input) {
+      const fileName = input.files[0] ? input.files[0].name : 'Выберите видео (MP4, MOV, WEBM до 50 МБ)';
+      document.getElementById('crealFileName').textContent = fileName;
+    }
+
+    // 4. Toast уведомления
     function showToast(message, type = 'success') {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
@@ -487,7 +539,7 @@
       }, 4000);
     }
 
-    // Авто-скрытие начальных Toast-уведомлений (от Flask)
+    // Авто-скрытие начальных Toast
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.toast').forEach(toast => {
         setTimeout(() => {
@@ -498,7 +550,7 @@
       });
     });
 
-    // --- 5. Глобальный делегат событий для AJAX форм ---
+    // 5. Глобальный делегат событий для AJAX форм
     document.addEventListener('submit', async function(e) {
       const form = e.target;
       const action = form.getAttribute('action') || form.action;
@@ -566,7 +618,7 @@
         }
       }
 
-      // B. Лайки
+      // B. Лайки постов
       if (action.includes('/like_post/')) {
         e.preventDefault();
         const btn = form.querySelector('button');
@@ -670,26 +722,16 @@
           btn.disabled = false;
         }
       }
-    });
-  </script>
-        
-    // Обновление имени файла для видео
-    function updateCrealFileName(input) {
-      const fileName = input.files[0] ? input.files[0].name : 'Выберите видео (MP4, MOV, WEBM до 50 МБ)';
-      document.getElementById('crealFileName').textContent = fileName;
-    }
 
-    // AJAX загрузка Creal
-    const crealForm = document.querySelector('form[action="/upload_creal"]');
-    if (crealForm) {
-      crealForm.addEventListener('submit', async function(e) {
+      // E. Загрузка Creal (видео)
+      if (action === '/upload_creal') {
         e.preventDefault();
         const btn = document.getElementById('uploadCrealBtn');
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Загрузка видео...';
         btn.disabled = true;
 
-        const formData = new FormData(this);
+        const formData = new FormData(form);
         try {
           const response = await fetch('/upload_creal', {
             method: 'POST',
@@ -700,12 +742,10 @@
 
           if (data.success) {
             showToast(data.message, 'success');
-            this.reset();
+            form.reset();
             document.getElementById('crealFileName').textContent = 'Выберите видео (MP4, MOV, WEBM до 50 МБ)';
             
-            // Добавляем новый Creal в сетку
             const grid = document.getElementById('crealsGrid');
-            // Удаляем заглушку "Загрузка", если она есть
             const placeholder = grid.querySelector('.fa-film');
             if (placeholder) placeholder.closest('.card').remove();
 
@@ -713,10 +753,12 @@
             newCard.className = 'glass-panel card';
             newCard.style.animation = 'slideUpFade 0.5s ease forwards';
             newCard.innerHTML = `
-              <video src="${data.creal.video_url}" controls style="width: 100%; border-radius: 12px; margin-bottom: 1rem; background: #000;"></video>
+              <video src="${data.creal.video_url}" controls class="creal-video"></video>
               <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 1rem;">${data.creal.description || ''}</p>
               <div class="card-footer">
-                <div class="author-badge"><i class="fas fa-user-circle"></i> ${data.creal.author}</div>
+                <div class="author-badge">
+                  <i class="fas fa-user-circle"></i> ${data.creal.author}
+                </div>
                 <form action="/like_creal/${data.creal.id}" method="POST" style="margin:0;">
                   <button type="submit" class="btn btn-icon like-btn" title="Нравится">
                     <i class="far fa-heart"></i> <span class="like-count" style="font-size: 0.85rem; margin-left: 4px;">0</span>
@@ -734,28 +776,41 @@
           btn.innerHTML = originalText;
           btn.disabled = false;
         }
-      });
-    }
+      }
 
-    // Глобальный делегат для лайков Creals (добавьте это внутрь существующего document.addEventListener('submit', ...))
-    // Найдите в своем коде место, где обрабатываются формы, и добавьте условие:
-    /*
+      // F. Лайки Creals
       if (action.includes('/like_creal/')) {
         e.preventDefault();
         const btn = form.querySelector('button');
         const icon = btn.querySelector('i');
         const countSpan = btn.querySelector('span');
+        
         btn.disabled = true;
         try {
-          const response = await fetch(action, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+          const response = await fetch(action, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          });
           const data = await response.json();
           if (data.success) {
             countSpan.textContent = data.likes_count;
-            icon.className = data.is_liked ? 'fas fa-heart' : 'far fa-heart';
+            if (data.is_liked) {
+              icon.classList.remove('far');
+              icon.classList.add('fas');
+            } else {
+              icon.classList.remove('fas');
+              icon.classList.add('far');
+            }
+          } else {
+            showToast(data.message, 'error');
           }
-        } catch (err) { showToast('Ошибка сети', 'error'); }
-        finally { btn.disabled = false; }
+        } catch (err) {
+          showToast('Ошибка сети', 'error');
+        } finally {
+          btn.disabled = false;
+        }
       }
-    */
+    });
+  </script>
 </body>
 </html>
